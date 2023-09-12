@@ -1,8 +1,7 @@
 {
   "name": "pkg-name",
   "version": "0.0.1",
-  "private": true,
-  "packageManager": "pnpm@8.6.9",
+  "packageManager": "pnpm@8.7.5",
   "author": "Deuscx",
   "license": "MIT",
   "funding": "https://github.com/sponsors/deuscx",
@@ -13,41 +12,44 @@
   },
   "bugs": "https://github.com/deuscx/pkg-name/issues",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
-    }
+    ".": "./dist/node/index.js",
+    "./client": "./dist/client/index.js",
+    "./package.json": "./package.json"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "./dist/node/index.js",
+  "types": "./dist/node/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "start": "tsx ./src/index.ts",
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc && npm run copy",
+    "copy": "copyfiles -u 1 \"src/**/*.vue\" dist",
     "lint": "eslint .",
     "lint:fix": "nr lint --fix",
     "release": "bumpp && npm publish",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:update": "vitest -u",
-    "prepublishOnly": "nr build"
+    "prepublishOnly": "nr build",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.39.8",
-    "bumpp": "^9.1.1",
-    "eslint": "^8.45.0",
-    "lint-staged": "^13.2.3",
-    "tsup": "^7.1.0",
-    "tsx": "^3.12.7",
-    "typescript": "^5.1.6",
-    "vite": "4.4.6",
-    "vite-plugin-inspect": "^0.7.33",
-    "vitest": "^0.33.0"
+    "@antfu/eslint-config": "^0.41.2",
+    "@vuepress/client": "2.0.0-beta.66",
+    "bumpp": "^9.2.0",
+    "copyfiles": "^2.4.1",
+    "cpx": "^1.5.0",
+    "eslint": "^8.49.0",
+    "lint-staged": "^14.0.1",
+    "rimraf": "^5.0.1",
+    "tsup": "^7.2.0",
+    "tsx": "^3.12.9",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.4",
+    "vue": "^3.3.4",
+    "vuepress": "2.0.0-beta.66"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
@@ -56,5 +58,10 @@
     "*.{js,ts,tsx,vue,md}": [
       "eslint --fix"
     ]
+  },
+  "dependencies": {
+    "@vuepress/utils": "2.0.0-beta.67",
+    "chokidar": "^3.5.3",
+    "flexsearch": "^0.7.31"
   }
 }
