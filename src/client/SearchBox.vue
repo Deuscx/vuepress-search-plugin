@@ -6,7 +6,6 @@ import { computed, ref } from 'vue'
 import { debouncedWatch } from '@vueuse/core'
 import Modal from './Modal.vue'
 
-console.log(index)
 const locale = useRouteLocale()
 const query = ref('')
 const localeIndex = new Map()
@@ -35,7 +34,6 @@ function setupLocalIndex() {
 const searchResults = ref()
 function search() {
   const results = currentIndex.value.search(query.value)
-  console.log(results)
   const uniqueResults = new Set(results.flatMap(item => item.result) || [])
   searchResults.value = [...uniqueResults].map((key) => {
     const page = index[locale.value].find(page => page.id === key)
