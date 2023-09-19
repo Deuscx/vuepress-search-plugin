@@ -54,28 +54,12 @@ function createHighlight(text: string, query: string, options: CreateHighlightOp
   const { full } = options
   const regex = new RegExp(query.split(/\s+/).filter(i => i?.length).join('|'), 'gi')
 
-  const showedText = full ? text : partialText(text, query.split(/\s+/))
+  const showedText = text
   const result = showedText.replace(regex, match => `<mark>${match}</mark>`)
 
   return result
 }
-const MAX_LENGTH = 150
-const MIN_LENGTH = 50
-function partialText(text: string, terms: string[]) {
-  const regex = new RegExp(terms.join('|'), 'ig')
-  const matches = text.matchAll(regex)
-  if (!matches)
-    return text.slice(0, MAX_LENGTH)
-  // FIXME: length is not correct
-  const groups: string[] = []
-  for (const match of Array.from(matches)) {
-    const index = match.index || 0
-    const start = Math.max(index - MIN_LENGTH, 0)
-    const end = Math.min(index + MIN_LENGTH, text.length)
-    groups.push(text.slice(start, end))
-  }
-  return groups.join('...')
-}
+
 debouncedWatch(query, search, { debounce: 200 })
 
 const searchModal = ref(false)
@@ -83,17 +67,22 @@ const searchModal = ref(false)
 
 <template>
   <div>
-    <button @click="searchModal = true">
+    <button class="search-btn" @click="searchModal = true">
       Search
     </button>
     <Modal v-model="searchModal">
-      <input v-model="query">
-      <div v-if="searchResults">
-        <div v-for="result in searchResults" :key="result.id">
-          <a :href="result.path">
-            <div v-html="result.title" />
-          </a>
-          <p v-html="result.excerpt" />
+      <div class="card">
+        <input v-model="query" class="search-input">
+        <div v-if="searchResults && searchResults.length" class="search-result">
+          <div v-for="result in searchResults" :key="result.id">
+            <a :href="result.path">
+              <div v-html="result.title" />
+            </a>
+            <p v-html="result.excerpt" />
+          </div>
+        </div>
+        <div v-else-if="query" class="search-result-notfound">
+          No results found.
         </div>
       </div>
     </Modal>
@@ -101,4 +90,52 @@ const searchModal = ref(false)
 </template>
 
 <style scoped>
+div, input{
+  box-sizing: border-box;
+}
+
+.search-btn {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-size: 14px;
+  background: transparent;
+}
+
+.card {
+  width: min(90vw,900px);
+  max-height: 90vh;
+  margin: 0 auto;
+  background: var(--search-card-bg);
+  border-radius: 4px;
+}
+
+.search-input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+}
+
+.search-result {
+  max-height: calc(90vh - 40px);
+  overflow: auto;
+  padding: 0 8px;
+}
+
+.search-result-notfound{
+  padding: 0 8px;
+  min-height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+
+<style>
+:root {
+  --search-card-bg: #fff;
+}
 </style>
